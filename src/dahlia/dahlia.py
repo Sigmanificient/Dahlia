@@ -131,7 +131,7 @@ class Dahlia:
         self.__no_reset = no_reset
         self.__patterns = _with_marker(marker)
         self.__marker = marker
-        self.__reset = marker + "r"
+        self.__reset = f"{marker}r"
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Dahlia):
@@ -390,16 +390,18 @@ def dahlia(
 def _find_codes(string: str, patterns: list[Pattern]) -> list[tuple[str, bool, str]]:
     codes: list[tuple[str, bool, str]] = []
     for pattern in patterns:
-        for match in pattern.finditer(string):
-            codes.append((match[0], match[1] == "~", match[2]))
+        codes.extend(
+            (match[0], match[1] == "~", match[2])
+            for match in pattern.finditer(string)
+        )
+
     return codes
 
 
 def _find_ansi_codes(string: str) -> list[str]:
     ansi_codes: list[str] = []
     for pattern in ANSI_REGEXES:
-        for match in pattern.finditer(string):
-            ansi_codes.append(match.group(0))
+        ansi_codes.extend(match.group(0) for match in pattern.finditer(string))
     return ansi_codes
 
 
